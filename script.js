@@ -360,7 +360,6 @@ function gerarEscalaPDF() {
     const totalSeguranca = pessoas.filter(p => p.funcao === 'seguranca').length;
 
     doc.setFontSize(12);
-    doc.text('Resumo:', 10, y);
     y += 10;
     doc.text(`Total de Monitores: ${totalMonitores}`, 10, y);
     y += 7;

@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,16 +10,17 @@
     <title>Gerenciamento de Postos</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div class="container">
         <h1>Gerenciamento de Postos</h1>
-        
+
         <section id="cadastro-pessoa">
             <h2>Cadastro de Pessoas</h2>
             <form id="form-pessoa">
                 <label for="nome-pessoa">Nome:</label>
                 <input type="text" id="nome-pessoa" required>
-                
+
                 <label for="funcao-pessoa">Função:</label>
                 <select id="funcao-pessoa">
                     <option value="monitor">Monitor</option>
@@ -29,7 +30,7 @@
 
                 <label for="prioridade-pessoa">É Prioridade:</label>
                 <input type="checkbox" id="prioridade-pessoa">
-                
+
                 <button type="button" class="btn" onclick="adicionarPessoa()">Adicionar</button>
             </form>
 
@@ -71,7 +72,7 @@
                     <option value="guarda-vida">Guarda Vida</option>
                     <option value="seguranca">Segurança</option>
                 </select>
-                
+
                 <button type="button" class="btn" onclick="adicionarPosto()">Adicionar</button>
             </form>
 
@@ -110,7 +111,7 @@
                     <form id="form-editar-pessoa">
                         <label for="editar-nome-pessoa">Nome:</label>
                         <input type="text" id="editar-nome-pessoa" required>
-                        
+
                         <label for="editar-funcao-pessoa">Função:</label>
                         <select id="editar-funcao-pessoa">
                             <option value="monitor">Monitor</option>
@@ -120,7 +121,7 @@
 
                         <label for="editar-prioridade-pessoa">É Prioridade:</label>
                         <input type="checkbox" id="editar-prioridade-pessoa">
-                        
+
                         <button type="button" class="btn" onclick="confirmarEdicaoPessoa()">Salvar</button>
                     </form>
                 </div>
@@ -153,35 +154,36 @@
                             <option value="guarda-vida">Guarda Vida</option>
                             <option value="seguranca">Segurança</option>
                         </select>
-                        
+
                         <button type="button" class="btn" onclick="confirmarEdicaoPosto()">Salvar</button>
                     </form>
                 </div>
             </div>
         </section>
 
-        <script src="script.js"></script>
     </div>
 
-        <section id="cortes">
-            <h2>Cortes</h2>
-            <label for="qtde-corte">Quantidade a Cortar:</label>
-            <input type="number" id="qtde-corte" min="0" required>
-            
-            <label for="setor-corte">Setor:</label>
-            <select id="setor-corte">
-                <option value="monitor">Monitor</option>
-                <option value="guarda-vida">Guarda Vida</option>
-                <option value="seguranca">Segurança</option>
-            </select>
+    <section id="cortes">
+        <h2>Cortes</h2>
+        <label for="qtde-corte">Quantidade a Cortar:</label>
+        <input type="number" id="qtde-corte" min="0" required>
 
-            <button type="button" class="btn btn-danger" onclick="realizarCortes()">Cortar</button>
-        </section>
+        <label for="setor-corte">Setor:</label>
+        <select id="setor-corte">
+            <option value="monitor">Monitor</option>
+            <option value="guarda-vida">Guarda Vida</option>
+            <option value="seguranca">Segurança</option>
+        </select>
 
+        <button type="button" class="btn btn-danger" onclick="realizarCortes()">Cortar</button>
+    </section>
+
+    <section id="gerar-pdf">
+        <h2>Escala do Dia</h2>
+        <button type="button" class="btn" onclick="gerarEscalaPDF()">Gerar escala do dia</button>
+    </section>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
 </body>
-</html>
 
-<section id="gerar-pdf">
-    <h2>Escala do Dia</h2>
-    <button type="button" class="btn" onclick="gerarEscalaPDF()">Gerar escala do dia</button>
-</section>
+</html>
