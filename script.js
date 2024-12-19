@@ -317,3 +317,56 @@ function realizarCortes() {
     listarPessoas();
     listarPostos();
 }
+
+// Função para gerar o PDF da escala do dia
+function gerarEscalaPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text('Escala do Dia', 10, 10);
+
+    const tipos = ['monitor', 'guarda-vida', 'seguranca'];
+    let y = 20;
+
+    tipos.forEach(tipo => {
+        const postosDoTipo = postos.filter(posto => posto.tipo === tipo);
+        if (postosDoTipo.length > 0) {
+            doc.setFontSize(14);
+            doc.text(tipo.charAt(0).toUpperCase() + tipo.slice(1), 10, y);
+            y += 10;
+
+            postosDoTipo.forEach(posto => {
+                doc.setFontSize(12);
+                doc.text(`${posto.nome} (${posto.radio ? 'Com Rádio' : 'Sem Rádio'})`, 10, y);
+                y += 7;
+
+                posto.pessoas.forEach(pessoa => {
+                    doc.setFontSize(10);
+                    doc.text(`- ${pessoa.nome}`, 15, y);
+                    y += 5;
+                });
+
+                y += 5;
+            });
+
+            y += 10;
+        }
+    });
+
+    // Resumo final
+    const totalMonitores = pessoas.filter(p => p.funcao === 'monitor').length;
+    const totalGuardaVidas = pessoas.filter(p => p.funcao === 'guarda-vida').length;
+    const totalSeguranca = pessoas.filter(p => p.funcao === 'seguranca').length;
+
+    doc.setFontSize(12);
+    doc.text('Resumo:', 10, y);
+    y += 10;
+    doc.text(`Total de Monitores: ${totalMonitores}`, 10, y);
+    y += 7;
+    doc.text(`Total de Guarda-Vidas: ${totalGuardaVidas}`, 10, y);
+    y += 7;
+    doc.text(`Total de Segurança: ${totalSeguranca}`, 10, y);
+
+    doc.save('escala_do_dia.pdf');
+}

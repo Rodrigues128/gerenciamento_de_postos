@@ -216,3 +216,43 @@ ul li {
 .btn-danger:hover {
     background-color: #c9302c;
 }
+
+/* Responsividade */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    table, th, td {
+        font-size: 12px;
+    }
+
+    button {
+        font-size: 14px;
+    }
+}
+
+/* Botão para gerar PDF */
+#gerar-pdf {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#gerar-pdf button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+#gerar-pdf button:hover {
+    background-color: #218838;
+}
