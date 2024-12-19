@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Postos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Gerenciamento de Postos</h1>
+        
+        <section id="cadastro-pessoa">
+            <h2>Cadastro de Pessoas</h2>
+            <form id="form-pessoa">
+                <label for="nome-pessoa">Nome:</label>
+                <input type="text" id="nome-pessoa" required>
+                
+                <label for="funcao-pessoa">Função:</label>
+                <select id="funcao-pessoa">
+                    <option value="monitor">Monitor</option>
+                    <option value="guarda-vida">Guarda Vida</option>
+                    <option value="seguranca">Segurança</option>
+                </select>
+
+                <label for="prioridade-pessoa">É Prioridade:</label>
+                <input type="checkbox" id="prioridade-pessoa">
+                
+                <button type="button" class="btn" onclick="adicionarPessoa()">Adicionar</button>
+            </form>
+
+            <h3>Lista de Pessoas</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Função</th>
+                        <th>Prioridade</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-pessoas"></tbody>
+            </table>
+        </section>
+
+        <section id="cadastro-posto">
+            <h2>Cadastro de Postos</h2>
+            <form id="form-posto">
+                <label for="nome-posto">Nome do Posto:</label>
+                <input type="text" id="nome-posto" required>
+
+                <label for="radio-posto">Tem Rádio:</label>
+                <input type="checkbox" id="radio-posto">
+
+                <label for="min-pessoas">Mínimo:</label>
+                <input type="number" id="min-pessoas" min="0" required>
+
+                <label for="med-pessoas">Médio:</label>
+                <input type="number" id="med-pessoas" min="0" required>
+
+                <label for="max-pessoas">Máximo:</label>
+                <input type="number" id="max-pessoas" min="0" required>
+
+                <label for="tipo-pessoas">Tipo:</label>
+                <select id="tipo-pessoas">
+                    <option value="monitor">Monitor</option>
+                    <option value="guarda-vida">Guarda Vida</option>
+                    <option value="seguranca">Segurança</option>
+                </select>
+                
+                <button type="button" class="btn" onclick="adicionarPosto()">Adicionar</button>
+            </form>
+
+            <h3>Lista de Postos</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Rádio</th>
+                        <th>Mín.</th>
+                        <th>Méd.</th>
+                        <th>Máx.</th>
+                        <th>Tipo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-postos"></tbody>
+            </table>
+        </section>
+
+        <section id="sorteio">
+            <h2>Sorteio</h2>
+            <button type="button" class="btn" onclick="sortearPessoas()">Realizar Sorteio</button>
+            <div id="resultado-sorteio">
+                <h3>Resultado:</h3>
+                <div id="detalhes-sorteio"></div>
+            </div>
+        </section>
+
+        <section id="modais">
+            <!-- Modal para editar pessoa -->
+            <div id="modal-editar-pessoa" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="fecharModal('modal-editar-pessoa')">&times;</span>
+                    <h2>Editar Pessoa</h2>
+                    <form id="form-editar-pessoa">
+                        <label for="editar-nome-pessoa">Nome:</label>
+                        <input type="text" id="editar-nome-pessoa" required>
+                        
+                        <label for="editar-funcao-pessoa">Função:</label>
+                        <select id="editar-funcao-pessoa">
+                            <option value="monitor">Monitor</option>
+                            <option value="guarda-vida">Guarda Vida</option>
+                            <option value="seguranca">Segurança</option>
+                        </select>
+
+                        <label for="editar-prioridade-pessoa">É Prioridade:</label>
+                        <input type="checkbox" id="editar-prioridade-pessoa">
+                        
+                        <button type="button" class="btn" onclick="confirmarEdicaoPessoa()">Salvar</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal para editar posto -->
+            <div id="modal-editar-posto" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="fecharModal('modal-editar-posto')">&times;</span>
+                    <h2>Editar Posto</h2>
+                    <form id="form-editar-posto">
+                        <label for="editar-nome-posto">Nome:</label>
+                        <input type="text" id="editar-nome-posto" required>
+
+                        <label for="editar-radio-posto">Tem Rádio:</label>
+                        <input type="checkbox" id="editar-radio-posto">
+
+                        <label for="editar-min-pessoas">Mínimo:</label>
+                        <input type="number" id="editar-min-pessoas" min="0" required>
+
+                        <label for="editar-med-pessoas">Médio:</label>
+                        <input type="number" id="editar-med-pessoas" min="0" required>
+
+                        <label for="editar-max-pessoas">Máximo:</label>
+                        <input type="number" id="editar-max-pessoas" min="0" required>
+
+                        <label for="editar-tipo-pessoas">Tipo:</label>
+                        <select id="editar-tipo-pessoas">
+                            <option value="monitor">Monitor</option>
+                            <option value="guarda-vida">Guarda Vida</option>
+                            <option value="seguranca">Segurança</option>
+                        </select>
+                        
+                        <button type="button" class="btn" onclick="confirmarEdicaoPosto()">Salvar</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <script src="script.js"></script>
+    </div>
+
+        <section id="cortes">
+            <h2>Cortes</h2>
+            <label for="qtde-corte">Quantidade a Cortar:</label>
+            <input type="number" id="qtde-corte" min="0" required>
+            
+            <label for="setor-corte">Setor:</label>
+            <select id="setor-corte">
+                <option value="monitor">Monitor</option>
+                <option value="guarda-vida">Guarda Vida</option>
+                <option value="seguranca">Segurança</option>
+            </select>
+
+            <button type="button" class="btn btn-danger" onclick="realizarCortes()">Cortar</button>
+        </section>
+
+</body>
+</html>
