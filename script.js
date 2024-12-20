@@ -6,19 +6,28 @@ let indexEdicao = null;
 
 // Adicionar Pessoa
 function adicionarPessoa() {
-    const nome = document.getElementById('nome-pessoa').value;
-    const funcao = document.getElementById('funcao-pessoa').value;
-    const prioridade = document.getElementById('prioridade-pessoa').checked;
+    const inputNome = document.getElementById('nome-pessoa');
+    const inputFuncao = document.getElementById('funcao-pessoa');
+    const prioridade = document.getElementById('pessoa-fixa').value; // Obtém o valor selecionado
 
-    if (nome === '') {
+    if (!inputNome.value.trim()) {
         alert('Por favor, insira o nome.');
         return;
     }
 
+    // Converte o nome e a função para o formato com a primeira letra maiúscula
+    const nome = inputNome.value.trim().toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+    const funcao = inputFuncao.value.trim().toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+
+    // Adiciona a pessoa na lista
     pessoas.push({ nome, funcao, prioridade });
     salvarPessoas();
     listarPessoas();
-    document.getElementById('form-pessoa').reset();
+
+    // Reseta o formulário
+    inputNome.value = '';
+    inputFuncao.value = 'monitor';
+    document.getElementById('pessoa-fixa').value = 'nao';
 }
 
 // Exibir Modal para editar pessoa
@@ -28,23 +37,25 @@ function iniciarEdicaoPessoa(index) {
 
     document.getElementById('editar-nome-pessoa').value = pessoa.nome;
     document.getElementById('editar-funcao-pessoa').value = pessoa.funcao;
-    document.getElementById('editar-prioridade-pessoa').checked = pessoa.prioridade;
+    document.getElementById('editar-pessoa-fixa').value = pessoa.prioridade;
 
     abrirModal('modal-editar-pessoa');
 }
 
 // Confirmar edição de pessoa
 function confirmarEdicaoPessoa() {
-    const nome = document.getElementById('editar-nome-pessoa').value;
+    const nome = document.getElementById('editar-nome-pessoa').value.trim();
     const funcao = document.getElementById('editar-funcao-pessoa').value;
-    const prioridade = document.getElementById('editar-prioridade-pessoa').checked;
+    const prioridade = document.getElementById('editar-pessoa-fixa').value;
 
     if (nome === '') {
         alert('Por favor, insira o nome.');
         return;
     }
 
+    // Atualiza os dados da pessoa no array
     pessoas[indexEdicao] = { nome, funcao, prioridade };
+
     salvarPessoas();
     listarPessoas();
     fecharModal('modal-editar-pessoa');
@@ -55,7 +66,6 @@ function adicionarPosto() {
     const nome = document.getElementById('nome-posto').value;
     const radio = document.getElementById('radio-posto').checked;
     const min = parseInt(document.getElementById('min-pessoas').value);
-    const med = parseInt(document.getElementById('med-pessoas').value);
     const max = parseInt(document.getElementById('max-pessoas').value);
     const tipo = document.getElementById('tipo-pessoas').value;
 
@@ -64,7 +74,7 @@ function adicionarPosto() {
         return;
     }
 
-    postos.push({ nome, radio, min, med, max, tipo, pessoas: [] });
+    postos.push({ nome, radio, min, max, tipo, pessoas: [] });
     salvarPostos();
     listarPostos();
     document.getElementById('form-posto').reset();
@@ -78,7 +88,6 @@ function iniciarEdicaoPosto(index) {
     document.getElementById('editar-nome-posto').value = posto.nome;
     document.getElementById('editar-radio-posto').checked = posto.radio;
     document.getElementById('editar-min-pessoas').value = posto.min;
-    document.getElementById('editar-med-pessoas').value = posto.med;
     document.getElementById('editar-max-pessoas').value = posto.max;
     document.getElementById('editar-tipo-pessoas').value = posto.tipo;
 
@@ -90,7 +99,6 @@ function confirmarEdicaoPosto() {
     const nome = document.getElementById('editar-nome-posto').value;
     const radio = document.getElementById('editar-radio-posto').checked;
     const min = parseInt(document.getElementById('editar-min-pessoas').value);
-    const med = parseInt(document.getElementById('editar-med-pessoas').value);
     const max = parseInt(document.getElementById('editar-max-pessoas').value);
     const tipo = document.getElementById('editar-tipo-pessoas').value;
 
@@ -99,7 +107,7 @@ function confirmarEdicaoPosto() {
         return;
     }
 
-    postos[indexEdicao] = { nome, radio, min, med, max, tipo, pessoas: postos[indexEdicao].pessoas };
+    postos[indexEdicao] = { nome, radio, min, max, tipo, pessoas: postos[indexEdicao].pessoas };
     salvarPostos();
     listarPostos();
     fecharModal('modal-editar-posto');
@@ -107,9 +115,30 @@ function confirmarEdicaoPosto() {
 
 // Listar Pessoas
 function listarPessoas() {
+    const tabela = document.getElementById('tabela-pessoas');
     const tbody = document.getElementById('lista-pessoas');
-    tbody.innerHTML = '';
+    const thead = tabela.querySelector('thead');
+    const toggleButton = document.getElementById('toggle-pessoas-btn'); // Botão de alternância
 
+    tbody.innerHTML = ''; // Limpa o corpo da tabela
+
+    if (pessoas.length === 0) {
+        // Oculta o cabeçalho e desativa o botão de alternância
+        thead.style.display = 'none';
+        toggleButton.disabled = true;
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" style="text-align: center;">Nenhuma pessoa cadastrada.</td>
+            </tr>
+        `;
+        return;
+    }
+
+    // Exibe o cabeçalho da tabela e ativa o botão de alternância
+    thead.style.display = 'table-header-group';
+    toggleButton.disabled = false;
+
+    // Adiciona as pessoas cadastradas na tabela
     pessoas.forEach((pessoa, index) => {
         const row = `<tr>
             <td>${pessoa.nome}</td>
@@ -126,15 +155,35 @@ function listarPessoas() {
 
 // Listar Postos
 function listarPostos() {
+    const tabela = document.getElementById('tabela-postos');
     const tbody = document.getElementById('lista-postos');
-    tbody.innerHTML = '';
+    const thead = tabela.querySelector('thead');
+    const toggleButton = document.getElementById('toggle-postos-btn'); // Botão de alternância
 
+    tbody.innerHTML = ''; // Limpa o corpo da tabela
+
+    if (postos.length === 0) {
+        // Oculta o cabeçalho e desativa o botão de alternância
+        thead.style.display = 'none';
+        toggleButton.disabled = true;
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center;">Nenhum posto cadastrado.</td>
+            </tr>
+        `;
+        return;
+    }
+
+    // Exibe o cabeçalho da tabela e ativa o botão de alternância
+    thead.style.display = 'table-header-group';
+    toggleButton.disabled = false;
+
+    // Adiciona os postos cadastrados na tabela
     postos.forEach((posto, index) => {
         const row = `<tr>
             <td>${posto.nome}</td>
             <td>${posto.radio ? 'Sim' : 'Não'}</td>
             <td>${posto.min}</td>
-            <td>${posto.med}</td>
             <td>${posto.max}</td>
             <td>${posto.tipo}</td>
             <td>
@@ -286,7 +335,7 @@ function realizarCortes() {
         if (candidatos.length === 0) break;
         const randomIndex = Math.floor(Math.random() * candidatos.length);
         const removido = candidatos[randomIndex];
-        
+
         // Remover da lista global de pessoas
         pessoas = pessoas.filter(p => p !== removido);
 
@@ -368,4 +417,11 @@ function gerarEscalaPDF() {
     doc.text(`Total de Segurança: ${totalSeguranca}`, 10, y);
 
     doc.save('escala_do_dia.pdf');
+}
+
+function toggleVisibility(id) {
+    const table = document.getElementById(id);
+    if (table) {
+        table.classList.toggle('hidden');
+    }
 }

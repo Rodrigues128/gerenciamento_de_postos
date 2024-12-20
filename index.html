@@ -1,10 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciamento de Postos</title>
@@ -18,29 +16,45 @@
         <section id="cadastro-pessoa">
             <h2>Cadastro de Pessoas</h2>
             <form id="form-pessoa">
-                <label for="nome-pessoa">Nome:</label>
-                <input type="text" id="nome-pessoa" required>
+                <div>
+                    <div>
+                        <label for="nome-pessoa">Nome:</label>
+                        <input type="text" id="nome-pessoa" class="inputs-cadastro-pessoa" placeholder="Digite o nome"
+                            required>
+                    </div>
 
-                <label for="funcao-pessoa">Função:</label>
-                <select id="funcao-pessoa">
-                    <option value="monitor">Monitor</option>
-                    <option value="guarda-vida">Guarda Vida</option>
-                    <option value="seguranca">Segurança</option>
-                </select>
+                    <div>
+                        <label for="funcao-pessoa">Função:</label>
+                        <select id="funcao-pessoa">
+                            <option value="monitor">Monitor</option>
+                            <option value="guarda-vida">Guarda Vida</option>
+                            <option value="seguranca">Segurança</option>
+                        </select>
+                    </div>
 
-                <label for="prioridade-pessoa">É Prioridade:</label>
-                <input type="checkbox" id="prioridade-pessoa">
+                    <div>
+                        <label for="pessoa-fixa">Fixo:</label>
+                        <select id="pessoa-fixa">
+                            <option value="sim">Sim</option>
+                            <option value="nao" selected>Não</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn" onclick="adicionarPessoa()">Adicionar Pessoa</button>
+                </div>
 
-                <button type="button" class="btn" onclick="adicionarPessoa()">Adicionar</button>
             </form>
 
-            <h3>Lista de Pessoas</h3>
-            <table>
+            <h3>
+                Lista de Pessoas
+                <button type="button" id="toggle-pessoas-btn"
+                    onclick="toggleVisibility('tabela-pessoas')">Ocultar/Mostrar</button>
+            </h3>
+            <table id="tabela-pessoas">
                 <thead>
                     <tr>
                         <th>Nome</th>
                         <th>Função</th>
-                        <th>Prioridade</th>
+                        <th>Fixo</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -60,9 +74,6 @@
                 <label for="min-pessoas">Mínimo:</label>
                 <input type="number" id="min-pessoas" min="0" required>
 
-                <label for="med-pessoas">Médio:</label>
-                <input type="number" id="med-pessoas" min="0" required>
-
                 <label for="max-pessoas">Máximo:</label>
                 <input type="number" id="max-pessoas" min="0" required>
 
@@ -76,14 +87,17 @@
                 <button type="button" class="btn" onclick="adicionarPosto()">Adicionar</button>
             </form>
 
-            <h3>Lista de Postos</h3>
-            <table>
+            <h3>
+                Lista de Postos
+                <button type="button" id="toggle-postos-btn"
+                    onclick="toggleVisibility('tabela-postos')">Ocultar/Mostrar</button>
+            </h3>
+            <table id="tabela-postos">
                 <thead>
                     <tr>
                         <th>Nome</th>
                         <th>Rádio</th>
                         <th>Mín.</th>
-                        <th>Méd.</th>
                         <th>Máx.</th>
                         <th>Tipo</th>
                         <th>Ações</th>
@@ -91,11 +105,12 @@
                 </thead>
                 <tbody id="lista-postos"></tbody>
             </table>
+
         </section>
 
         <section id="sorteio">
-            <h2>Sorteio</h2>
-            <button type="button" class="btn" onclick="sortearPessoas()">Realizar Sorteio</button>
+            <h2>Distribuição</h2>
+            <button type="button" class="btn" onclick="sortearPessoas()">Realizar Distribuição</button>
             <div id="resultado-sorteio">
                 <h3>Resultado:</h3>
                 <div id="detalhes-sorteio"></div>
@@ -119,8 +134,11 @@
                             <option value="seguranca">Segurança</option>
                         </select>
 
-                        <label for="editar-prioridade-pessoa">É Prioridade:</label>
-                        <input type="checkbox" id="editar-prioridade-pessoa">
+                        <label for="editar-pessoa-fixa">Fixo:</label>
+                        <select id="editar-pessoa-fixa">
+                            <option value="sim">Sim</option>
+                            <option value="nao">Não</option>
+                        </select>
 
                         <button type="button" class="btn" onclick="confirmarEdicaoPessoa()">Salvar</button>
                     </form>
@@ -161,29 +179,32 @@
             </div>
         </section>
 
+        <section id="cortes">
+            <h2>Cortes</h2>
+            <label for="qtde-corte">Quantidade a Cortar:</label>
+            <input type="number" id="qtde-corte" min="0" required>
+
+            <label for="setor-corte">Setor:</label>
+            <select id="setor-corte">
+                <option value="monitor">Monitor</option>
+                <option value="guarda-vida">Guarda Vida</option>
+                <option value="seguranca">Segurança</option>
+            </select>
+
+            <button type="button" class="btn btn-danger" onclick="realizarCortes()">Cortar</button>
+        </section>
+
+        <section id="gerar-pdf">
+            <h2>Escala do Dia</h2>
+            <button type="button" class="btn" onclick="gerarEscalaPDF()">Gerar escala do dia</button>
+        </section>
     </div>
 
-    <section id="cortes">
-        <h2>Cortes</h2>
-        <label for="qtde-corte">Quantidade a Cortar:</label>
-        <input type="number" id="qtde-corte" min="0" required>
 
-        <label for="setor-corte">Setor:</label>
-        <select id="setor-corte">
-            <option value="monitor">Monitor</option>
-            <option value="guarda-vida">Guarda Vida</option>
-            <option value="seguranca">Segurança</option>
-        </select>
 
-        <button type="button" class="btn btn-danger" onclick="realizarCortes()">Cortar</button>
-    </section>
-
-    <section id="gerar-pdf">
-        <h2>Escala do Dia</h2>
-        <button type="button" class="btn" onclick="gerarEscalaPDF()">Gerar escala do dia</button>
-    </section>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="script.js"></script>
+
 </body>
 
 </html>

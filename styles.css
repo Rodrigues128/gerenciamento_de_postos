@@ -38,14 +38,11 @@ form {
 }
 
 label {
-    display: block;
     margin: 5px 0;
     font-weight: bold;
 }
 
 input, select, button {
-    display: block;
-    width: 100%;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
@@ -56,7 +53,32 @@ input, select, button {
 input[type="checkbox"] {
     width: auto;
 }
+#form-pessoa select {
+    width: 100%;
+    max-width: 200px;
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
 
+#form-pessoa div {
+    display: flex;
+    justify-content: flex-start;
+}
+#form-pessoa div div {
+    margin-right: 50px;
+}
+
+#form-pessoa div div #nome-pessoa {
+    width: 300px;
+}
+#form-pessoa label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    margin-right: 10px;
+}
 button {
     background-color: #3498db;
     color: #fff;
@@ -255,4 +277,8 @@ ul li {
 
 #gerar-pdf button:hover {
     background-color: #218838;
+}
+
+.hidden {
+    display: none;
 }
