@@ -63,13 +63,13 @@ function confirmarEdicaoPessoa() {
 // Adicionar Posto
 function adicionarPosto() {
     const nomeInput = document.getElementById('nome-posto');
-    const radioInput = document.getElementById('radio-posto');
+    const radioInput = document.getElementById('radio-posto').value; // Obter valor do select
     const minInput = document.getElementById('min-pessoas');
     const maxInput = document.getElementById('max-pessoas');
     const tipoInput = document.getElementById('tipo-pessoas');
 
     const nome = nomeInput.value.trim();
-    const radio = radioInput.checked;
+    const radio = radioInput === 'sim'; // Convertendo valor para booleano
     const min = parseInt(minInput.value, 10);
     const max = parseInt(maxInput.value, 10);
     const tipo = tipoInput.value;
@@ -91,11 +91,12 @@ function adicionarPosto() {
     listarPostos();
 
     nomeInput.value = '';
-    radioInput.checked = false;
+    document.getElementById('radio-posto').value = 'nao'; // Reseta o campo select
     minInput.value = '';
     maxInput.value = '';
     tipoInput.value = 'monitor';
 }
+
 
 // Exibir Modal para editar posto
 function iniciarEdicaoPosto(index) {
@@ -253,7 +254,6 @@ function salvarPostos() {
     localStorage.setItem('postos', JSON.stringify(postos));
 }
 
-
 // Carregar Dados
 function carregarDados() {
     const pessoasSalvas = localStorage.getItem('pessoas');
@@ -274,128 +274,6 @@ function toggleVisibility(id) {
     if (table) {
         table.classList.toggle('hidden');
     }
-}
-// Função de Distribuir Postos
-function sortearPessoas() {
-    // Limpa os postos previamente atribuídos
-    postos.forEach(posto => posto.pessoas = []);
-
-    // Copia a lista de pessoas e organiza por prioridade
-    let candidatos = [...pessoas].sort((a, b) => b.prioridade.localeCompare(a.prioridade));
-    let avisos = [];
-
-    // Distribuir pessoas para atingir o mínimo de cada posto
-    postos.forEach(posto => {
-        const aptos = candidatos.filter(pessoa => pessoa.funcao === posto.tipo);
-
-        while (posto.pessoas.length < posto.min && aptos.length > 0) {
-            const pessoaSelecionada = aptos.shift();
-            posto.pessoas.push(pessoaSelecionada);
-            candidatos = candidatos.filter(p => p !== pessoaSelecionada);
-        }
-
-        // Caso não seja possível atingir o mínimo, emitir aviso
-        if (posto.pessoas.length < posto.min) {
-            avisos.push(`Não há pessoas suficientes para preencher o mínimo no posto ${posto.nome}.`);
-        }
-    });
-
-    // Distribuir pessoas restantes até atingir o máximo
-    while (candidatos.length > 0) {
-        let distribuido = false;
-
-        for (const posto of postos) {
-            if (posto.pessoas.length < posto.max) {
-                const aptos = candidatos.filter(pessoa => pessoa.funcao === posto.tipo);
-
-                if (aptos.length > 0) {
-                    const pessoaSelecionada = aptos.shift();
-                    posto.pessoas.push(pessoaSelecionada);
-                    candidatos = candidatos.filter(p => p !== pessoaSelecionada);
-                    distribuido = true;
-                }
-            }
-        }
-
-        // Caso não seja possível distribuir mais ninguém, parar o processo
-        if (!distribuido) break;
-    }
-
-    // Exibir resultado
-    exibirResultadoSorteio();
-
-    // Mostrar avisos, caso existam
-    if (avisos.length > 0) {
-        alert(avisos.join('\n'));
-    }
-}
-
-function sortearPessoas() {
-    // Limpa os postos
-    postos.forEach(posto => posto.pessoas = []);
-
-    let candidatos = [...pessoas];
-    let avisos = [];
-
-    // Distribuir pessoas de acordo com o mínimo
-    postos.forEach(posto => {
-        const aptos = candidatos.filter(pessoa => pessoa.funcao === posto.tipo);
-
-        while (posto.pessoas.length < posto.min && aptos.length > 0) {
-            const randomIndex = Math.floor(Math.random() * aptos.length);
-            posto.pessoas.push(aptos[randomIndex]);
-            candidatos = candidatos.filter(p => p !== aptos[randomIndex]);
-        }
-
-        // Verificar se não foi possível atingir o mínimo
-        if (posto.pessoas.length < posto.min) {
-            avisos.push(`Não há pessoas suficientes para preencher o mínimo no posto ${posto.nome}.`);
-        }
-    });
-
-    // Distribuir uniformemente até atingir o máximo
-    while (candidatos.length > 0) {
-        let distribuido = false;
-
-        for (const posto of postos) {
-            if (posto.pessoas.length < posto.max) {
-                const aptos = candidatos.filter(pessoa => pessoa.funcao === posto.tipo);
-
-                if (aptos.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * aptos.length);
-                    posto.pessoas.push(aptos[randomIndex]);
-                    candidatos = candidatos.filter(p => p !== aptos[randomIndex]);
-                    distribuido = true;
-                }
-            }
-        }
-
-        if (!distribuido) break;
-    }
-
-    exibirResultadoSorteio();
-
-    // Exibir avisos, se houver
-    if (avisos.length > 0) {
-        alert(avisos.join('\n'));
-    }
-}
-
-// Exibir Resultado do Sorteio
-function exibirResultadoSorteio() {
-    const detalhesSorteio = document.getElementById('detalhes-sorteio');
-    detalhesSorteio.innerHTML = '';
-
-    postos.forEach(posto => {
-        const div = document.createElement('div');
-        div.innerHTML = `
-            <h4>${posto.nome} (${posto.radio ? 'Com Rádio' : 'Sem Rádio'})</h4>
-            <ul>
-                ${posto.pessoas.map(pessoa => `<li>${pessoa.nome}</li>`).join('')}
-            </ul>
-        `;
-        detalhesSorteio.appendChild(div);
-    });
 }
 
 
@@ -508,55 +386,114 @@ function gerarEscalaPDF() {
     doc.save('escala_do_dia.pdf');
 }
 
-function gerarEscalaPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
 
-    doc.setFontSize(16);
-    doc.text('Escala do Dia', 10, 10);
 
-    const tipos = ['monitor', 'guarda-vida', 'seguranca'];
-    let y = 20;
+// Função revisada para distribuir pessoas aos postos
+function distribuirPostos() {
+    // Certifique-se de que a limpeza de pessoas em cada posto está sendo chamada corretamente
+    if (!postos || postos.length === 0) {
+        console.warn('Nenhum posto disponível para limpar ou distribuir.');
+        return;
+    }
 
-    tipos.forEach(tipo => {
+    postos.forEach(posto => (posto.pessoas = []));
+
+    let avisos = [];
+
+    // Verificar se há pessoas e postos disponíveis
+    if (pessoas.length === 0) {
+        alert('Não há pessoas cadastradas para realizar a distribuição.');
+        return;
+    }
+
+    if (postos.length === 0) {
+        alert('Não há postos cadastrados para realizar a distribuição.');
+        return;
+    }
+
+    // Verificar se existem tipos específicos de pessoas cadastradas
+    const tiposPresentes = ['monitor', 'guarda-vida', 'seguranca'].filter(tipo => 
+        pessoas.some(pessoa => pessoa.funcao === tipo)
+    );
+
+    if (tiposPresentes.length === 0) {
+        alert('Não há pessoas cadastradas para as funções exigidas (monitor, guarda-vida, segurança).');
+        return;
+    }
+
+    console.log("Tipos de pessoas cadastradas presentes:", tiposPresentes);
+
+    // Separar pessoas por tipo para evitar manipulação incorreta
+    const candidatosPorTipo = {
+        monitor: [...pessoas.filter(pessoa => pessoa.funcao === 'monitor')],
+        'guarda-vida': [...pessoas.filter(pessoa => pessoa.funcao === 'guarda-vida')],
+        seguranca: [...pessoas.filter(pessoa => pessoa.funcao === 'seguranca')],
+    };
+
+    console.log("Candidatos por Tipo:", candidatosPorTipo);
+
+    // Distribuir pessoas para cada tipo de posto
+    Object.keys(candidatosPorTipo).forEach(tipo => {
+        const candidatos = candidatosPorTipo[tipo];
         const postosDoTipo = postos.filter(posto => posto.tipo === tipo);
-        if (postosDoTipo.length > 0) {
-            doc.setFontSize(14);
-            doc.text(tipo.charAt(0).toUpperCase() + tipo.slice(1), 10, y);
-            y += 10;
 
-            postosDoTipo.forEach(posto => {
-                doc.setFontSize(12);
-                doc.text(`${posto.nome} (${posto.radio ? 'Com Rádio' : 'Sem Rádio'})`, 10, y);
-                y += 7;
+        console.log(`Distribuindo para postos do tipo ${tipo}:`, postosDoTipo);
 
-                posto.pessoas.forEach(pessoa => {
-                    doc.setFontSize(10);
-                    doc.text(`- ${pessoa.nome}`, 15, y);
-                    y += 5;
-                });
+        postosDoTipo.forEach(posto => {
+            // Alocar o mínimo necessário
+            while (posto.pessoas.length < posto.min && candidatos.length > 0) {
+                const pessoaSelecionada = candidatos.shift();
+                posto.pessoas.push(pessoaSelecionada);
+            }
 
-                y += 5;
-            });
+            console.log(`Após alocação mínima no posto ${posto.nome}:`, posto.pessoas);
 
-            y += 10;
-        }
+            // Verifica se o mínimo foi atendido
+            if (posto.pessoas.length < posto.min) {
+                avisos.push(`O posto "${posto.nome}" (${tipo}) não atingiu o mínimo de ${posto.min} pessoas.`);
+            }
+        });
+
+        // Alocar excedentes até o máximo
+        postosDoTipo.forEach(posto => {
+            while (posto.pessoas.length < posto.max && candidatos.length > 0) {
+                const pessoaSelecionada = candidatos.shift();
+                posto.pessoas.push(pessoaSelecionada);
+            }
+
+            console.log(`Após alocação máxima no posto ${posto.nome}:`, posto.pessoas);
+        });
     });
 
-    // Resumo final
-    const totalMonitores = pessoas.filter(p => p.funcao === 'monitor').length;
-    const totalGuardaVidas = pessoas.filter(p => p.funcao === 'guarda-vida').length;
-    const totalSeguranca = pessoas.filter(p => p.funcao === 'seguranca').length;
+    // Exibir resultados e avisos
+    exibirResultadoDistribuicao();
 
-    doc.setFontSize(12);
-    y += 10;
-    doc.text(`Total de Monitores: ${totalMonitores}`, 10, y);
-    y += 7;
-    doc.text(`Total de Guarda-Vidas: ${totalGuardaVidas}`, 10, y);
-    y += 7;
-    doc.text(`Total de Segurança: ${totalSeguranca}`, 10, y);
-
-    doc.save('escala_do_dia.pdf');
+    if (avisos.length > 0) {
+        alert(avisos.join('\n'));
+    }
 }
 
+// Função para exibir o resultado da distribuição
+function exibirResultadoDistribuicao() {
+    const detalhesSorteio = document.getElementById('detalhes-distribuicao');
+    detalhesSorteio.innerHTML = '';
+
+    if (postos.length === 0) {
+        detalhesSorteio.innerHTML = '<p>Nenhum posto disponível para exibir.</p>';
+        return;
+    }
+
+    postos.forEach(posto => {
+        const div = document.createElement('div');
+        div.innerHTML = `
+            <h4>${posto.nome} (${posto.radio ? 'Com Rádio' : 'Sem Rádio'})</h4>
+            <ul>
+                ${posto.pessoas.map(pessoa => `<li>${pessoa.nome}</li>`).join('')}
+            </ul>
+        `;
+        detalhesSorteio.appendChild(div);
+    });
+
+    console.log("Resultado Final:", postos);
+}
 window.onload = carregarDados;

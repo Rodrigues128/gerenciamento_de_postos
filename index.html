@@ -22,7 +22,6 @@
                         <input type="text" id="nome-pessoa" class="inputs-cadastro-pessoa" placeholder="Digite o nome"
                             required>
                     </div>
-
                     <div>
                         <label for="funcao-pessoa">Função:</label>
                         <select id="funcao-pessoa">
@@ -31,7 +30,6 @@
                             <option value="seguranca">Segurança</option>
                         </select>
                     </div>
-
                     <div>
                         <label for="pessoa-fixa">Fixo:</label>
                         <select id="pessoa-fixa">
@@ -39,10 +37,12 @@
                             <option value="nao" selected>Não</option>
                         </select>
                     </div>
-                    <button type="button" class="btn" onclick="adicionarPessoa()">Adicionar Pessoa</button>
                 </div>
-
+                <button type="button" class="btn" onclick="adicionarPessoa()">Adicionar Pessoa</button>
             </form>
+
+
+
 
             <h3>
                 Lista de Pessoas
@@ -65,27 +65,39 @@
         <section id="cadastro-posto">
             <h2>Cadastro de Postos</h2>
             <form id="form-posto">
-                <label for="nome-posto">Nome do Posto:</label>
-                <input type="text" id="nome-posto" required>
-
-                <label for="radio-posto">Tem Rádio:</label>
-                <input type="checkbox" id="radio-posto">
-
-                <label for="min-pessoas">Mínimo:</label>
-                <input type="number" id="min-pessoas" min="0" required>
-
-                <label for="max-pessoas">Máximo:</label>
-                <input type="number" id="max-pessoas" min="0" required>
-
-                <label for="tipo-pessoas">Tipo:</label>
-                <select id="tipo-pessoas">
-                    <option value="monitor">Monitor</option>
-                    <option value="guarda-vida">Guarda Vida</option>
-                    <option value="seguranca">Segurança</option>
-                </select>
-
+                <div>
+                    <div>
+                        <label for="nome-posto">Nome do Posto:</label>
+                        <input placeholder="Digite o posto" type="text" id="nome-posto" required>
+                    </div>
+                    <div>
+                        <label for="radio-posto">Tem Rádio:</label>
+                        <select id="radio-posto">
+                            <option value="sim">Sim</option>
+                            <option value="nao" selected>Não</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="min-pessoas">Mínimo:</label>
+                        <input type="number" id="min-pessoas" min="0" required>
+                    </div>
+                    <div>
+                        <label for="max-pessoas">Máximo:</label>
+                        <input type="number" id="max-pessoas" min="0" required>
+                    </div>
+                    <div>
+                        <label for="tipo-pessoas">Tipo:</label>
+                        <select id="tipo-pessoas">
+                            <option value="monitor">Monitor</option>
+                            <option value="guarda-vida">Guarda Vida</option>
+                            <option value="seguranca">Segurança</option>
+                        </select>
+                    </div>
+                </div>
                 <button type="button" class="btn" onclick="adicionarPosto()">Adicionar Posto</button>
             </form>
+
+
 
             <h3>
                 Lista de Postos
@@ -108,12 +120,12 @@
 
         </section>
 
-        <section id="sorteio">
+        <section id="distribuicao">
             <h2>Distribuição</h2>
-            <button type="button" class="btn" onclick="sortearPessoas()">Realizar Distribuição</button>
-            <div id="resultado-sorteio">
+            <button type="button" class="btn" onclick="distribuirPostos()">Realizar Distribuição</button>
+            <div id="resultado-distribuicao">
                 <h3>Resultado:</h3>
-                <div id="detalhes-sorteio"></div>
+                <div id="detalhes-distribuicao"></div>
             </div>
         </section>
 
@@ -128,14 +140,14 @@
                         <input type="text" id="editar-nome-pessoa" required>
 
                         <label for="editar-funcao-pessoa">Função:</label>
-                        <select id="editar-funcao-pessoa">
+                        <select id="editar-funcao-pessoa" required>
                             <option value="monitor">Monitor</option>
                             <option value="guarda-vida">Guarda Vida</option>
                             <option value="seguranca">Segurança</option>
                         </select>
 
                         <label for="editar-pessoa-fixa">Fixo:</label>
-                        <select id="editar-pessoa-fixa">
+                        <select id="editar-pessoa-fixa" required>
                             <option value="sim">Sim</option>
                             <option value="nao">Não</option>
                         </select>
@@ -155,7 +167,7 @@
                         <input type="text" id="editar-nome-posto" required>
 
                         <label for="editar-radio-posto">Tem Rádio:</label>
-                        <input type="checkbox" id="editar-radio-posto">
+                        <input type="checkbox" id="editar-radio-posto" required>
 
                         <label for="editar-min-pessoas">Mínimo:</label>
                         <input type="number" id="editar-min-pessoas" min="0" required>
@@ -164,7 +176,7 @@
                         <input type="number" id="editar-max-pessoas" min="0" required>
 
                         <label for="editar-tipo-pessoas">Tipo:</label>
-                        <select id="editar-tipo-pessoas">
+                        <select id="editar-tipo-pessoas" required>
                             <option value="monitor">Monitor</option>
                             <option value="guarda-vida">Guarda Vida</option>
                             <option value="seguranca">Segurança</option>
@@ -201,6 +213,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="script.js"></script>
+    <script src="dist.js"></script>
 
 </body>
 
