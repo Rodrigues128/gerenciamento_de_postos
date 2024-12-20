@@ -1,4 +1,3 @@
-
 // Variáveis Globais
 let pessoas = [];
 let postos = [];
@@ -63,21 +62,39 @@ function confirmarEdicaoPessoa() {
 
 // Adicionar Posto
 function adicionarPosto() {
-    const nome = document.getElementById('nome-posto').value;
-    const radio = document.getElementById('radio-posto').checked;
-    const min = parseInt(document.getElementById('min-pessoas').value);
-    const max = parseInt(document.getElementById('max-pessoas').value);
-    const tipo = document.getElementById('tipo-pessoas').value;
+    const nomeInput = document.getElementById('nome-posto');
+    const radioInput = document.getElementById('radio-posto');
+    const minInput = document.getElementById('min-pessoas');
+    const maxInput = document.getElementById('max-pessoas');
+    const tipoInput = document.getElementById('tipo-pessoas');
 
-    if (nome === '' || isNaN(min) || isNaN(med) || isNaN(max)) {
-        alert('Por favor, preencha todos os campos corretamente.');
+    const nome = nomeInput.value.trim();
+    const radio = radioInput.checked;
+    const min = parseInt(minInput.value, 10);
+    const max = parseInt(maxInput.value, 10);
+    const tipo = tipoInput.value;
+
+    if (!nome || isNaN(min) || isNaN(max) || min > max) {
+        alert('Por favor, preencha os campos corretamente. O mínimo não pode ser maior que o máximo.');
         return;
     }
 
-    postos.push({ nome, radio, min, max, tipo, pessoas: [] });
+    const formattedNome = nome.charAt(0).toUpperCase() + nome.slice(1).toLowerCase();
+
+    if (postos.some(posto => posto.nome === formattedNome)) {
+        alert('Já existe um posto com esse nome. Por favor, insira um nome único.');
+        return;
+    }
+
+    postos.push({ nome: formattedNome, radio, min, max, tipo, pessoas: [] });
     salvarPostos();
     listarPostos();
-    document.getElementById('form-posto').reset();
+
+    nomeInput.value = '';
+    radioInput.checked = false;
+    minInput.value = '';
+    maxInput.value = '';
+    tipoInput.value = 'monitor';
 }
 
 // Exibir Modal para editar posto
@@ -96,20 +113,28 @@ function iniciarEdicaoPosto(index) {
 
 // Confirmar edição de posto
 function confirmarEdicaoPosto() {
-    const nome = document.getElementById('editar-nome-posto').value;
+    const nome = document.getElementById('editar-nome-posto').value.trim();
     const radio = document.getElementById('editar-radio-posto').checked;
-    const min = parseInt(document.getElementById('editar-min-pessoas').value);
-    const max = parseInt(document.getElementById('editar-max-pessoas').value);
+    const min = parseInt(document.getElementById('editar-min-pessoas').value, 10);
+    const max = parseInt(document.getElementById('editar-max-pessoas').value, 10);
     const tipo = document.getElementById('editar-tipo-pessoas').value;
 
-    if (nome === '' || isNaN(min) || isNaN(med) || isNaN(max)) {
-        alert('Por favor, preencha todos os campos corretamente.');
+    if (!nome || isNaN(min) || isNaN(max) || min > max) {
+        alert('Por favor, preencha os campos corretamente. O mínimo não pode ser maior que o máximo.');
         return;
     }
 
-    postos[indexEdicao] = { nome, radio, min, max, tipo, pessoas: postos[indexEdicao].pessoas };
+    const formattedNome = nome.charAt(0).toUpperCase() + nome.slice(1).toLowerCase();
+
+    if (postos.some((posto, idx) => posto.nome === formattedNome && idx !== indexEdicao)) {
+        alert('Já existe um posto com esse nome. Por favor, insira um nome único.');
+        return;
+    }
+
+    postos[indexEdicao] = { nome: formattedNome, radio, min, max, tipo, pessoas: postos[indexEdicao].pessoas };
     salvarPostos();
     listarPostos();
+
     fecharModal('modal-editar-posto');
 }
 
@@ -158,27 +183,27 @@ function listarPostos() {
     const tabela = document.getElementById('tabela-postos');
     const tbody = document.getElementById('lista-postos');
     const thead = tabela.querySelector('thead');
-    const toggleButton = document.getElementById('toggle-postos-btn'); // Botão de alternância
+    const toggleButton = document.getElementById('toggle-postos-btn');
 
-    tbody.innerHTML = ''; // Limpa o corpo da tabela
+    tbody.innerHTML = '';
 
     if (postos.length === 0) {
-        // Oculta o cabeçalho e desativa o botão de alternância
         thead.style.display = 'none';
         toggleButton.disabled = true;
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" style="text-align: center;">Nenhum posto cadastrado.</td>
+                <td colspan="6" style="text-align: center;">Nenhum posto cadastrado.</td>
             </tr>
         `;
         return;
     }
-
     // Exibe o cabeçalho da tabela e ativa o botão de alternância
     thead.style.display = 'table-header-group';
     toggleButton.disabled = false;
 
     // Adiciona os postos cadastrados na tabela
+    const postosUnicos = Array.from(new Set(postos.map(p => JSON.stringify(p)))).map(p => JSON.parse(p));
+    postos = postosUnicos;
     postos.forEach((posto, index) => {
         const row = `<tr>
             <td>${posto.nome}</td>
@@ -228,6 +253,7 @@ function salvarPostos() {
     localStorage.setItem('postos', JSON.stringify(postos));
 }
 
+
 // Carregar Dados
 function carregarDados() {
     const pessoasSalvas = localStorage.getItem('pessoas');
@@ -241,10 +267,69 @@ function carregarDados() {
 }
 
 // Inicializar
-window.onload = carregarDados;
 
+// Daqui para cima está funcionado corretamente, agora precisa arrumar as funções abaixo
+function toggleVisibility(id) {
+    const table = document.getElementById(id);
+    if (table) {
+        table.classList.toggle('hidden');
+    }
+}
+// Função de Distribuir Postos
+function sortearPessoas() {
+    // Limpa os postos previamente atribuídos
+    postos.forEach(posto => posto.pessoas = []);
 
-// Função de Sorteio
+    // Copia a lista de pessoas e organiza por prioridade
+    let candidatos = [...pessoas].sort((a, b) => b.prioridade.localeCompare(a.prioridade));
+    let avisos = [];
+
+    // Distribuir pessoas para atingir o mínimo de cada posto
+    postos.forEach(posto => {
+        const aptos = candidatos.filter(pessoa => pessoa.funcao === posto.tipo);
+
+        while (posto.pessoas.length < posto.min && aptos.length > 0) {
+            const pessoaSelecionada = aptos.shift();
+            posto.pessoas.push(pessoaSelecionada);
+            candidatos = candidatos.filter(p => p !== pessoaSelecionada);
+        }
+
+        // Caso não seja possível atingir o mínimo, emitir aviso
+        if (posto.pessoas.length < posto.min) {
+            avisos.push(`Não há pessoas suficientes para preencher o mínimo no posto ${posto.nome}.`);
+        }
+    });
+
+    // Distribuir pessoas restantes até atingir o máximo
+    while (candidatos.length > 0) {
+        let distribuido = false;
+
+        for (const posto of postos) {
+            if (posto.pessoas.length < posto.max) {
+                const aptos = candidatos.filter(pessoa => pessoa.funcao === posto.tipo);
+
+                if (aptos.length > 0) {
+                    const pessoaSelecionada = aptos.shift();
+                    posto.pessoas.push(pessoaSelecionada);
+                    candidatos = candidatos.filter(p => p !== pessoaSelecionada);
+                    distribuido = true;
+                }
+            }
+        }
+
+        // Caso não seja possível distribuir mais ninguém, parar o processo
+        if (!distribuido) break;
+    }
+
+    // Exibir resultado
+    exibirResultadoSorteio();
+
+    // Mostrar avisos, caso existam
+    if (avisos.length > 0) {
+        alert(avisos.join('\n'));
+    }
+}
+
 function sortearPessoas() {
     // Limpa os postos
     postos.forEach(posto => posto.pessoas = []);
@@ -367,7 +452,62 @@ function realizarCortes() {
     listarPostos();
 }
 
+
 // Função para gerar o PDF da escala do dia
+function gerarEscalaPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text('Escala do Dia', 10, 10);
+
+    const tipos = ['monitor', 'guarda-vida', 'seguranca'];
+    let y = 20;
+
+    tipos.forEach(tipo => {
+        const postosDoTipo = postos.filter(posto => posto.tipo === tipo);
+        if (postosDoTipo.length > 0) {
+            doc.setFontSize(14);
+            doc.text(tipo.charAt(0).toUpperCase() + tipo.slice(1), 10, y);
+            y += 10;
+
+            // Cabeçalho da tabela
+            doc.setFontSize(12);
+            doc.text('Posto', 10, y);
+            doc.text('Nome(s)', 60, y);
+            doc.text('Tem Rádio', 150, y);
+            y += 7;
+
+            postosDoTipo.forEach(posto => {
+                const nomes = posto.pessoas.map(pessoa => pessoa.nome).join(', ');
+                doc.text(posto.nome, 10, y);
+                doc.text(nomes || '-', 60, y);
+                doc.text(posto.radio ? 'Sim' : 'Não', 150, y);
+                y += 7;
+            });
+
+            y += 10;
+        }
+    });
+
+    // Resumo final
+    const totalMonitores = pessoas.filter(p => p.funcao === 'monitor').length;
+    const totalGuardaVidas = pessoas.filter(p => p.funcao === 'guarda-vida').length;
+    const totalSeguranca = pessoas.filter(p => p.funcao === 'seguranca').length;
+
+    doc.setFontSize(12);
+    y += 10;
+    doc.text('Legenda:', 10, y);
+    y += 7;
+    doc.text(`Total de Monitores: ${totalMonitores}`, 10, y);
+    y += 7;
+    doc.text(`Total de Guarda-Vidas: ${totalGuardaVidas}`, 10, y);
+    y += 7;
+    doc.text(`Total de Segurança: ${totalSeguranca}`, 10, y);
+
+    doc.save('escala_do_dia.pdf');
+}
+
 function gerarEscalaPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
@@ -419,9 +559,4 @@ function gerarEscalaPDF() {
     doc.save('escala_do_dia.pdf');
 }
 
-function toggleVisibility(id) {
-    const table = document.getElementById(id);
-    if (table) {
-        table.classList.toggle('hidden');
-    }
-}
+window.onload = carregarDados;
